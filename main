@@ -12,13 +12,11 @@ from pybricks.media.ev3dev import SoundFile, ImageFile
 # Click "Open user guide" on the EV3 extension tab for more information.
 
 
-# Create your objects here.
 ev3 = EV3Brick()
 
 
-# Write your program here.
+# Connects the diffrent motors and sensors to ports on the EV3
 ev3.speaker.beep()
-
 plate_motor = Motor(Port.A)
 pen_motor = Motor(Port.B)
 lift_motor = Motor(Port.C)
@@ -32,10 +30,12 @@ color_sensor2 = ColorSensor(Port.S3)
 BLACK = 5
 WHITE = 75
 
+# Initiates variables to be used in the loop
 outer_loop = True
 inner_loop = True
 antall = 0
 
+# Prints a message to the EV3 screen
 def print_name():
     melding1 = "Hei, mitt navn er"
     melding2 = "Picasso"
@@ -52,7 +52,8 @@ def print_name():
         ev3.speaker.beep()
         wait(150)
         j += 1
-        
+
+# Feed a paper to the drawing board
 def paper_feeder():
     lift_motor.run(-400)
     wait(300)
@@ -61,7 +62,8 @@ def paper_feeder():
     printer_motor.stop()
     lift_motor.stop()
     wait(1700)
-    
+
+# Spins the pen and drawing plate to draw epitrochoids
 def draw_circle():
     wait(300)
     plate_motor.run(275)
@@ -71,6 +73,7 @@ def draw_circle():
     pen_motor.stop()
     wait(300)
 
+# Spins the drawing plate back and forward
 def spin_plate():
     lift_motor.run(-400)
     wait(500)
@@ -80,6 +83,7 @@ def spin_plate():
     wait(4000)
     lift_motor.stop()
 
+# Spins the drawing plate to push the paper off using a sensor to check if the paper has fallen off
 def push_paper_off():
     plate = False
     spin = True
@@ -104,7 +108,8 @@ def push_paper_off():
     lift_motor.stop()
     plate_motor.stop()
     wait(300)
-    
+
+# Alligns the drawing plate to start position
 def allign_plate():
     while(color_sensor2.reflection() < 45):
         plate_motor.run(50)
