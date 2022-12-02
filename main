@@ -1,0 +1,130 @@
+#!/usr/bin/env pybricks-micropython
+import random
+from pybricks.hubs import EV3Brick
+from pybricks.ev3devices import (Motor, TouchSensor, ColorSensor,
+                                 InfraredSensor, UltrasonicSensor, GyroSensor)
+from pybricks.parameters import Port, Stop, Direction, Button, Color
+from pybricks.tools import wait, StopWatch, DataLog
+from pybricks.robotics import DriveBase
+from pybricks.media.ev3dev import SoundFile, ImageFile
+
+# This program requires LEGO EV3 MicroPython v2.0 or higher.
+# Click "Open user guide" on the EV3 extension tab for more information.
+
+
+# Create your objects here.
+ev3 = EV3Brick()
+
+
+# Write your program here.
+ev3.speaker.beep()
+
+plate_motor = Motor(Port.A)
+pen_motor = Motor(Port.B)
+lift_motor = Motor(Port.C)
+printer_motor = Motor(Port.D)
+color_sensor = ColorSensor(Port.S1)
+start_button = TouchSensor(Port.S2)
+color_sensor2 = ColorSensor(Port.S3)
+
+
+# Adds values for recognizing the emptiness of the plate
+BLACK = 5
+WHITE = 75
+
+outer_loop = True
+inner_loop = True
+antall = 0
+
+def print_name():
+    melding1 = "Hei, mitt navn er"
+    melding2 = "Picasso"
+    i = 0
+    while (i < len(melding1)):
+        ev3.screen.print(melding1[i], end ="")
+        ev3.speaker.beep()
+        wait(150)
+        i += 1
+    ev3.screen.print("")
+    j = 0
+    while (j < len(melding2)):
+        ev3.screen.print(melding2[j], end ="")
+        ev3.speaker.beep()
+        wait(150)
+        j += 1
+        
+def paper_feeder():
+    lift_motor.run(-400)
+    wait(300)
+    printer_motor.run(100)
+    wait(6600)
+    printer_motor.stop()
+    lift_motor.stop()
+    wait(1700)
+    
+def draw_circle():
+    wait(300)
+    plate_motor.run(275)
+    pen_motor.run(850)
+    wait(40000)
+    plate_motor.stop()
+    pen_motor.stop()
+    wait(300)
+
+def spin_plate():
+    lift_motor.run(-400)
+    wait(500)
+    plate_motor.run(1000)
+    wait(4000)
+    plate_motor.run(-1000)
+    wait(4000)
+    lift_motor.stop()
+
+def push_paper_off():
+    plate = False
+    spin = True
+    a = 0
+    while(spin):
+        while(a < 10):
+            plate_motor.run(50)
+            wait(1000)
+            testtall = color_sensor.reflection()
+            wait(500)
+            if (testtall > 20):
+                plate = True
+                a = 10
+            a += 1
+        if(plate):
+            spin_plate()
+            a = 0
+            plate = False
+        else:
+            spin = False
+            
+    lift_motor.stop()
+    plate_motor.stop()
+    wait(300)
+    
+def allign_plate():
+    while(color_sensor2.reflection() < 45):
+        plate_motor.run(50)
+    plate_motor.stop()
+    wait(500)
+
+
+while outer_loop: 
+    if start_button.pressed():
+        print_name()
+        allign_plate()
+        while antall < 11:
+            if color_sensor.reflection() > 10: #hvit
+                draw_circle()
+                push_paper_off()
+                allign_plate()
+            if color_sensor.reflection() <= 10: #svart
+                paper_feeder()
+            antall += 1
+        outler_loop = False
+            
+                
+        
